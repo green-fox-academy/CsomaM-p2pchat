@@ -27,7 +27,7 @@ public class MainController {
     @RequestMapping("/enter")
     public String add (Model model){
         model.addAttribute("newuser", new User());
-        return "enter";
+        return "";
     }
 
     @PostMapping("/createuser")

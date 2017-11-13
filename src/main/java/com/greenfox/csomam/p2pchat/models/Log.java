@@ -4,6 +4,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -21,14 +22,17 @@ public class Log {
     private String requestData;
 
     public Log() {
-        System.getenv();
     }
 
-    public Log(String path, String method, String dateAndTime, String logLevel, String requestData) {
-        this.path = path;
-        this.method = method;
+    public Log(HttpServletRequest request) {
+        this.path = request.getServletPath();
+        this.method = request.getMethod();
         this.dateAndTime = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-        this.logLevel = logLevel;
-        this.requestData = requestData;
+        this.logLevel = System.getenv("CHAT_APP_LOGLEVEL");
+        this.requestData = request.getQueryString();
+    }
+
+    public String toString() {
+        return dateAndTime + " " + logLevel + " " + path + " " + method + " " + requestData;
     }
 }

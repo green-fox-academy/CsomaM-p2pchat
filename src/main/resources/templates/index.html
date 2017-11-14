@@ -9,7 +9,7 @@
 <div class="container-fluid">
     <h1 class="text-center">Peer To Peer Chat Program</h1>
     <nav class="nav justify-content-center">
-        <a class="nav-link active" href="/enter" style="font-size: x-large">Enter</a>
+        <a class="nav-link active" href="/enter" style="font-size: x-large">New User</a>
         <a class="nav-link active" href="/info" style="font-size: x-large">Logs</a>
         <a class="nav-link active" href="/messageboard" style="font-size: x-large">Messageboard</a>
     </nav>
@@ -23,7 +23,9 @@
         </thead>
         <tbody>
         <tr th:each="user : ${users}">
-            <th th:text="*{user.name}" scope="col" >User</th>
+            <th>
+                <a th:href="@{'messageboard/{id}'(id=${user.id})}" th:text="*{user.name}">User</a>
+            </th>
         </tr>
         </tbody>
     </table>

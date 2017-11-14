@@ -1,17 +1,15 @@
 package com.greenfox.csomam.p2pchat.controllers;
 
-import com.greenfox.csomam.p2pchat.models.ChatMessage;
+import com.greenfox.csomam.p2pchat.models.Message;
 import com.greenfox.csomam.p2pchat.models.Log;
 import com.greenfox.csomam.p2pchat.models.User;
 import com.greenfox.csomam.p2pchat.repositories.LogRepo;
-import com.greenfox.csomam.p2pchat.repositories.MessageRepo;
-import com.greenfox.csomam.p2pchat.repositories.UserRepo;
+import com.greenfox.csomam.p2pchat.services.MessageService;
+import com.greenfox.csomam.p2pchat.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -19,22 +17,22 @@ import javax.servlet.http.HttpServletRequest;
 public class MainController {
 
     @Autowired
+    MessageService messageService;
+
+    @Autowired
+    UserService userService;
+
+    @Autowired
     LogRepo logRepo;
-
-    @Autowired
-    UserRepo userRepo;
-
-    @Autowired
-    MessageRepo messageRepo;
 
     @ModelAttribute
     protected void initLog(HttpServletRequest request) {
         logRepo.save(new Log(request));
     }
 
-    @RequestMapping({"/index", "/"})
+    @RequestMapping({"/index", "/", ""})
     public String indexPage(Model model) {
-        model.addAttribute("users", userRepo.findAll());
+        model.addAttribute("users", userService.listAll());
         return "index";
     }
 
@@ -46,7 +44,7 @@ public class MainController {
 
     @PostMapping("/createuser")
     public String addPost(@ModelAttribute User newuser, Model model) {
-        if (userRepo.findFelhasznalo(newuser.getName()) != null) {
+        if (userService.getUserByName(newuser.getName()) != null) {
             model.addAttribute("errorMessage", "Username already exists!");
             model.addAttribute("newuser", new User());
             return "enter";
@@ -55,8 +53,8 @@ public class MainController {
             model.addAttribute("newuser", new User());
             return "enter";
         }
-        userRepo.save(newuser);
-        return "redirect:/messageboard/{}";
+        userService.addUser(newuser);
+        return "redirect:/index";
     }
 
     @RequestMapping("/info")
@@ -65,19 +63,18 @@ public class MainController {
         return "info";
     }
 
-    @RequestMapping("/messageboard")
-    public String showMessageBoard(Model model) {
-        model.addAttribute("newmessage", new ChatMessage());
-        model.addAttribute("messages", messageRepo.findAll());
+    @GetMapping("/messageboard/{id}")
+    public String showMessageBoard(Model model, @PathVariable() long id) {
+        model.addAttribute("user", userService.getUser(id));
+        model.addAttribute("newmessage", new Message());
+        model.addAttribute("messages", messageService.listAll());
         return "messageboard";
     }
 
-    @PostMapping("/createmessage")
-    public String createMessage (@ModelAttribute ChatMessage newmessage) {
-        newmessage.setMessageBy("Marci");
-        messageRepo.save(newmessage);
-        return "redirect:/";
+    @PostMapping("/createmessage/{id}")
+    public String createMessage (@ModelAttribute Message newmessage, @PathVariable() long id) {
+        newmessage.setUsername(userService.getUser(id).getName());
+        messageService.addMessage(newmessage);
+        return "redirect:/messageboard/{id}";
     }
-
-
 }

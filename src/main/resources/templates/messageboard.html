@@ -10,9 +10,9 @@
 <div class="container-fluid">
     <h1 class="text-center">Messageboard</h1>
     <nav class="nav justify-content-center">
-        <a class="nav-link active" href="/index" style="font-size: x-large">Index</a>
+        <a class="nav-link active" href="/index" style="font-size: x-large">Home Page</a>
         <a class="nav-link active" href="/info" style="font-size: x-large">Logs</a>
-        <a class="nav-link active" href="/enter" style="font-size: x-large">Change user</a>
+        <a class="nav-link active" href="/enter" style="font-size: x-large">New User</a>
     </nav>
 </div>
 
@@ -26,18 +26,18 @@
     <tr th:each="message : ${messages}">
         <td>
         <ul>
-            <li th:text="*{message.messageBy}" scope="col" >User</li>
-            <p th:text="*{message.message}" scope="col" >Message</p>
+            <li th:text="*{message.username}" scope="col" >User</li>
+            <p th:text="*{message.text}" scope="col" >Message</p>
         </ul>
         </td>
     </tr>
     </tbody>
 </table>
-<form th:action="@{/createmessage}" th:object="${newmessage}" method="post">
+<form th:action="@{'/createmessage/{id}'(id=${user.id})}" th:object="${newmessage}" method="post">
     <div>
         <p>
-            <label >Submit a message: </label>
-            <input type="text" placeholder="Enter your message here" th:field="*{message}" />
+            <label >Submit a text: </label>
+            <input type="text" placeholder="Enter your text here" th:field="*{text}" />
             <button type="submit" >Submit</button>
         </p>
     </div>
